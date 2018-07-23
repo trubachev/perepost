@@ -7,22 +7,21 @@ const App = {
       title: document.getElementById("title"),
       name: document.getElementById("name"),
       story: document.getElementById("story"),
-      controlls : document.getElementById("controlls"),
+      controlls: document.getElementById("controlls"),
       sideControlls: document.getElementById("side-controlls"),
       controllsButtons: document.getElementById("buttons"),
-      controllsInputs : document.getElementById("inputs"),
-      head3Controll : document.getElementById("head-3"),
-      head4Controll : document.getElementById("head-4"),
-      blockQuoteControll : document.getElementById("blockquote"),
-      linkControll : document.getElementById("link"),
-      inputLinkForm : document.getElementById("input-link-form"),
+      controllsInputs: document.getElementById("inputs"),
+      head3Controll: document.getElementById("head-3"),
+      head4Controll: document.getElementById("head-4"),
+      blockQuoteControll: document.getElementById("blockquote"),
+      linkControll: document.getElementById("link"),
+      inputLinkForm: document.getElementById("input-link-form"),
       linkInput: document.getElementById("link-input"),
-      publishButton : document.getElementById("publish-button"),
+      publishButton: document.getElementById("publish-button"),
       closeLinkForm: document.getElementById("close-link-input")
     }
     app.loadFromLocalstorage()
     app.bindControlls()
-
   },
 
   bindControlls: function() {
@@ -38,83 +37,85 @@ const App = {
       app.saveToLocalstorage()
     })
 
-    app.els.story.addEventListener("input", (e) => {
+    app.els.story.addEventListener("input", e => {
       if (e.inputType !== "insertText") return
 
-      const paragraph = app.getParagraphNode()
-      if (!paragraph) return
+      app.setParagraphNode()
+      if (!app.paragraph) return
 
       const ulRegex = new RegExp(/^[\-\*]{1}\s/)
-      const paragraphText = paragraph.textContent.toString()
+      const paragraphText = app.paragraph.textContent.toString()
       if (ulRegex.test(paragraphText)) {
-
       }
-
     })
 
     app.els.publishButton.addEventListener("click", () => {
       app.publish()
     })
 
-    app.els.head3Controll.addEventListener("click", (e) => {
+    app.els.head3Controll.addEventListener("click", e => {
       app.toggleSeltedNodeTag("H3")
     })
 
-    app.els.head4Controll.addEventListener("click", (e) => {
+    app.els.head4Controll.addEventListener("click", e => {
       app.toggleSeltedNodeTag("H4")
     })
 
-
-    app.els.blockQuoteControll.addEventListener("click", (e) => {
+    app.els.blockQuoteControll.addEventListener("click", e => {
       app.toggleSeltedNodeTag("BLOCKQUOTE")
     })
 
-    app.els.linkControll.addEventListener("click", (e) => {
-      app.linkSelection = app.previousSelection
+    app.els.linkControll.addEventListener("click", e => {
+
+      // app.linkSelection = app.previousSelection
 
       if (app.isSelectionContainsTag("A")) {
-        const linkNodes = app.filteredSelectedNodes("A")
-        linkNodes.map((node) => {
-          node.insertAdjacentHTML("beforebegin", node.innerHTML)
-          node.remove()
-        })
+        document.execCommand("unlink")
+
+        // const linkNodes = app.filteredSelectedNodes("A")
+        // linkNodes.map(node => {
+        //   node.insertAdjacentHTML("beforebegin", node.innerHTML)
+        //   node.remove()
+        // })
       } else {
         app.toggleLinkForm()
       }
     })
 
-    app.els.closeLinkForm.addEventListener("click", (e) => {
+    app.els.closeLinkForm.addEventListener("click", e => {
       app.toggleLinkForm()
     })
 
-    document.addEventListener("selectionchange", (app.updateControlls.bind(app)))
+    document.addEventListener("selectionchange", app.updateControlls.bind(app))
 
-
-    app.els.inputLinkForm.addEventListener("submit", (e) => {
+    app.els.inputLinkForm.addEventListener("submit", e => {
       e.preventDefault()
 
       const link = app.els.linkInput.value
-      const linkChild = app.previousSelectionRange.extractContents()
-      app.previousSelectionRange.deleteContents()
-      const newLink = document.createElement("a")
-      newLink.setAttribute("href", link)
-      newLink.appendChild(linkChild)
-      app.previousSelectionRange.insertNode(newLink)
+
+      app.selection.removeAllRanges()
+      app.selection.addRange(app.previousSelectionRange)
+
+      document.execCommand("createLink", false, link)
+
       app.toggleLinkForm()
       app.els.linkInput.value = null
+      app.updateControllsButtons()
     })
 
-    Array.from(document.querySelectorAll("[contenteditable=true]")).forEach( editableEl => {
-      editableEl.addEventListener("paste", (e) => {
-        e.preventDefault()
-        e.stopPropagation()
+    Array.from(document.querySelectorAll("[contenteditable=true]")).forEach(
+      editableEl => {
+        editableEl.addEventListener("paste", e => {
+          e.preventDefault()
+          e.stopPropagation()
 
-        let pasteText = (e.clipboardData || window.clipboardData).getData("text")
-        // copyToClipboard(pasteText)
-        pasteTextLikeClipboard(pasteText)
-      })
-    })
-
+          let pasteText = (e.clipboardData || window.clipboardData).getData(
+            "text"
+          )
+          pasteTextLikeClipboard(pasteText)
+        })
+      }
+    )
 
     document.addEventListener("mousedown", e => {
       const app = this
@@ -138,16 +139,30 @@ const App = {
     const app = this
 
     app.selection = document.getSelection()
-    app.paragraphNode = app.getParagraphNode()
-    app.selectedNode = app.getSelectedNode()
-    app.previousSelectionRange = app.selectionRange
-    if (app.selection.rangeCount > 0) app.selectionRange = app.selection.getRangeAt(0)
+
+    app.setParagraphNode()
+    app.setSelectedNode()
+
+    if (
+      app.selectionRange &&
+      app.selectionRange.startContainer !== app.els.inputLinkForm
+    )
+      app.previousSelectionRange = app.selectionRange
+    if (app.selection.rangeCount > 0)
+      app.selectionRange = app.selection.getRangeAt(0)
     app.updateControllsVisibility()
     app.updateSideControllsVisibility()
 
-    const shouldUpdatePosition = !app.els.controlls.classList.contains("hide") && app.selectedNode !== app.els.controllsInputs && app.selection.toString() !== ""
-    const shouldUpdateButtons = !app.els.controlls.classList.contains("hide") && app.selectedNode !== app.els.controllsInputs
-    const shouldUpdateSideControllsPosition = !app.els.sideControlls.classList.contains("hide")
+    const shouldUpdatePosition =
+      !app.els.controlls.classList.contains("hide") &&
+      app.selectedNode !== app.els.controllsInputs &&
+      app.selection.toString() !== ""
+    const shouldUpdateButtons =
+      !app.els.controlls.classList.contains("hide") &&
+      app.selectedNode !== app.els.controllsInputs
+    const shouldUpdateSideControllsPosition = !app.els.sideControlls.classList.contains(
+      "hide"
+    )
 
     if (shouldUpdateSideControllsPosition) app.updateSideControllsPosition()
     if (shouldUpdatePosition) app.updateControllsPosition()
@@ -178,25 +193,37 @@ const App = {
 
     const newXHR = new XMLHttpRequest()
 
-    newXHR.addEventListener( 'load', function() {
+    newXHR.addEventListener("load", function() {
       window.location.replace(this.response)
     })
-    newXHR.open( 'POST', "/" )
-    newXHR.setRequestHeader("Content-Type", "application/json");
-    newXHR.send( JSON.stringify(data))
+    newXHR.open("POST", "/")
+    newXHR.setRequestHeader("Content-Type", "application/json")
+    newXHR.send(JSON.stringify(data))
   },
-  getParagraphNode: function() {
+  setParagraphNode: function() {
     const app = this
+    app.paragraphNode = null
+
     if (app.selection.rangeCount > 0) {
       const startContainer = app.selection.getRangeAt(0).startContainer
-      if (startContainer.nodeName !== "#text" && startContainer.classList.contains("paragraph")) return startContainer
-      return startContainer.parentElement.closest(".paragraph")
+      if (
+        startContainer.nodeName !== "#text" &&
+        startContainer.matches("#story > *")
+      )
+        app.paragraphNode = startContainer
+      else {
+        app.paragraphNode = startContainer.parentElement.closest("#story > *")
+      }
     }
   },
-  getSelectedNode: function() {
+  setSelectedNode: function() {
     const app = this
-    if (document.selection) return document.selection.createRange().parentElement()
-    else if (app.selection.rangeCount > 0) return app.selection.getRangeAt(0).startContainer.parentNode
+    let selectedNode
+    if (document.selection)
+      selectedNode = document.selection.createRange().parentElement()
+    else if (app.selection.rangeCount > 0)
+      selectedNode = app.selection.getRangeAt(0).startContainer.parentNode
+    app.selectedNode = selectedNode
   },
   updateSideControllsPosition: function() {
     const app = this
@@ -222,15 +249,21 @@ const App = {
   updateControllsButtons: function() {
     const app = this
 
-    const { controllsButtons, head3Controll, head4Controll, blockQuoteControll, linkControll } = app.els
+    const {
+      controllsButtons,
+      head3Controll,
+      head4Controll,
+      blockQuoteControll,
+      linkControll
+    } = app.els
 
-    const paragraphNode = app.selectedNode.closest(".paragraph")
+    const { paragraphNode } = app
 
     if (!paragraphNode) return
 
     const paragraphNodeTagName = paragraphNode.tagName
 
-    Array.from(controllsButtons.children).forEach((controll) => {
+    Array.from(controllsButtons.children).forEach(controll => {
       controll.classList.remove("controll-active")
     })
 
@@ -248,7 +281,8 @@ const App = {
         break
     }
 
-    if (app.isSelectionContainsTag("A")) linkControll.classList.add("controll-active")
+    if (app.isSelectionContainsTag("A"))
+      linkControll.classList.add("controll-active")
   },
 
   updateControllsVisibility: function() {
@@ -258,14 +292,13 @@ const App = {
     if (app.selection.toString() === "") return app.hideControlls()
     if (!app.paragraphNode) return app.hideControlls()
     app.showControlls()
-
   },
 
   updateSideControllsVisibility: function() {
     const app = this
 
-
-    if (app.paragraphNode && (app.paragraphNode.textContent === "")) app.showSideControlls()
+    if (app.paragraphNode && app.paragraphNode.textContent === "")
+      app.showSideControlls()
     else app.hideSideControlls()
   },
 
@@ -296,57 +329,17 @@ const App = {
   toggleSeltedNodeTag: function(newTag) {
     const app = this
 
-
-    // get current paragraph content
-    // wrap it into new tag
-    // get full HTML of the new el
-    // copy it to cliboard
-    // select whole paragraph
-    // paste from clipboard
-
     if (!app.selectedNode) return
-    let paragraphNode = app.selectedNode.closest(".paragraph")
+    let paragraphNode = app.paragraphNode
     const currentTagName = paragraphNode.tagName
 
     const newTagName = currentTagName === newTag ? "P" : newTag
 
     document.execCommand("formatBlock", false, `<${newTagName}>`)
-    paragraphNode = app.selectedNode.closest(".paragraph")
-    paragraphNode.classList.add(".paragraph")
-    // const newNode = document.createElement(newTagName)
-    // newNode.classList.add(paragraphNode.classList)
-    // newNode.innerHTML = paragraphNode.innerHTML
-    // const newRange = document.createRange()
-    // const selection = window.getSelection();
-    // newRange.selectNode(paragraphNode.parent)
-    // const firstChild = paragraphNode.childNodes.item(0)
-    // const lastChild = paragraphNode.childNodes.item(paragraphNode.childNodes.length-1)
-    // newRange.setStart(firstChild, 0)
-    // newRange.setEnd(lastChild, lastChild.textContent.length)
-    // selection.removeAllRanges()
-    // selection.addRange(newRange)
-    // pasteTextLikeClipboard(newNode.outerHTML)
-
-
-
-    // paragraphNode.parentNode.replaceChild(newNode, paragraphNode)
-
-    // const newRange = document.createRange()
-    // const selection = window.getSelection();
-    // const textNode = newNode.childNodes[0]
-    // newRange.selectNode(textNode)
-    // newRange.setStart(textNode, startOffset)
-    // newRange.setEnd(textNode, endOffset)
-    // selection.removeAllRanges()
-    // selection.addRange(newRange)
-    // app.selectedNode = newNode
-    // app.updateControllsButtons()
-    // app.updateControllsPosition()
-
   },
   validate: function() {
     const app = this
-    const {title, story} = app.els
+    const { title, story } = app.els
     const errors = {}
     if (title.textContent === "") errors.title = true
     if (story.textContent.trim() === "") errors.story = true
@@ -354,12 +347,15 @@ const App = {
     return errors
   },
   isSelectionContainsTag: function(tagName) {
-    const selection = document.getSelection()
-    const parent = selection.getRangeAt(0).commonAncestorContainer
-    if (parent.nodeName === "#text") return false
+    const app = this
 
-    return Array.from(parent.children).some((el) => {
-      if (el && selection.containsNode(el, true) && el.tagName === tagName) return true
+    const commonAncestor = app.selection.getRangeAt(0).commonAncestorContainer
+    if (commonAncestor.nodeName === "#text" && commonAncestor.parentNode.tagName === "A") return true
+    if (commonAncestor.nodeName === "#text") return false
+
+    return Array.from(commonAncestor.children).some(el => {
+      if (el && app.selection.containsNode(el, true) && el.tagName === tagName)
+        return true
     })
   },
   filteredSelectedNodes: function(filterTagName) {
@@ -367,8 +363,13 @@ const App = {
     const parent = selection.getRangeAt(0).commonAncestorContainer
     if (parent.nodeName === "#text") return false
 
-    return Array.from(parent.children).filter((el) => {
-      if (el && selection.containsNode(el, true) && el.tagName === filterTagName) return true
+    return Array.from(parent.children).filter(el => {
+      if (
+        el &&
+        selection.containsNode(el, true) &&
+        el.tagName === filterTagName
+      )
+        return true
     })
   },
   loadFromLocalstorage: function() {
@@ -394,65 +395,11 @@ const App = {
   }
 }
 
-// thanks Dominic Tobias
-const copyToClipboard = (function initClipboardText() {
-  const textarea = document.createElement('textarea');
-
-  // Move it off screen.
-  textarea.style.cssText = 'position: absolute; left: -99999em';
-
-  // Set to readonly to prevent mobile devices opening a keyboard when
-  // text is .select()'ed.
-  textarea.setAttribute('readonly', true);
-
-  document.body.appendChild(textarea);
-
-  return function setClipboardText(text) {
-    textarea.value = text;
-
-    // Check if there is any content selected previously.
-    const selected = document.getSelection().rangeCount > 0 ?
-      document.getSelection().getRangeAt(0) : false;
-
-    // iOS Safari blocks programmtic execCommand copying normally, without this hack.
-    // https://stackoverflow.com/questions/34045777/copy-to-clipboard-using-javascript-in-ios
-    if (navigator.userAgent.match(/ipad|ipod|iphone/i)) {
-      const editable = textarea.contentEditable;
-      textarea.contentEditable = true;
-      const range = document.createRange();
-      range.selectNodeContents(textarea);
-      const sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-      textarea.setSelectionRange(0, 999999);
-      textarea.contentEditable = editable;
-    } else {
-      textarea.select();
-    }
-
-    try {
-      const result = document.execCommand('copy');
-
-      // Restore previous selection.
-      if (selected) {
-        document.getSelection().removeAllRanges();
-        document.getSelection().addRange(selected);
-      }
-
-      return result;
-    } catch (err) {
-      return false;
-    }
-  };
-})();
 
 const pasteTextLikeClipboard = function(text) {
-  document.execCommand("insertHTML", false, text);
+  document.execCommand("insertHTML", false, text)
 }
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
   App.startApp()
 })
-
