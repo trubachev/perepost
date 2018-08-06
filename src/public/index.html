@@ -6,44 +6,42 @@
   </head>
   <body>
     <div id="editor" class="editor">
-      <h1 id="title" class="title" placeholder="Title" contenteditable=true></h1>
-      <div id="name" class="name" placeholder="your name" contenteditable=true></div>
-
-      <div id="controlls" class="controlls hide" unselectable="on">
-        <div id="buttons" class="buttons">
-          <div id="link" class="controll link">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2"/></svg>
-          </div>
-          <div id="head-3" class="controll head-3">
-            <svg stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" x2="15" y1="20" y2="20"/><line x1="12" x2="12" y1="4" y2="20"/></svg>
-          </div>
-          <div id="head-4" class="controll head-4">
-            <svg stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" x2="15" y1="20" y2="20"/><line x1="12" x2="12" y1="4" y2="20"/></svg>
-          </div>
-          <div id="blockquote" class="controll quote">
-            <svg enable-background="new 0 0 33 25" height="25px" id="Layer_1" version="1.1" viewBox="0 0 33 25" width="33px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path fill="currentColor" d="M18.006,6.538c0-1.973,0.662-3.554,1.988-4.743c1.326-1.19,2.977-1.785,4.947-1.785   c2.517,0,4.488,0.799,5.916,2.397C32.285,4.004,33,6.13,33,8.782c0,2.719-0.424,5.032-1.275,6.936   c-0.85,1.903-1.869,3.483-3.061,4.743c-1.188,1.258-2.43,2.244-3.723,2.958c-1.291,0.714-2.413,1.239-3.365,1.581l-3.265-5.508   c1.36-0.545,2.517-1.412,3.468-2.602c0.953-1.19,1.496-2.465,1.633-3.824c-1.359,0-2.602-0.597-3.724-1.786   C18.566,10.09,18.006,8.509,18.006,6.538z M0.359,6.538c0-1.973,0.663-3.554,1.989-4.743C3.674,0.604,5.324,0.01,7.295,0.01   c2.518,0,4.488,0.799,5.916,2.397c1.429,1.597,2.143,3.723,2.143,6.375c0,2.719-0.424,5.032-1.275,6.936   c-0.85,1.903-1.869,3.483-3.06,4.743c-1.188,1.258-2.431,2.244-3.724,2.958C6.004,24.133,4.883,24.658,3.93,25l-3.264-5.508   c1.36-0.545,2.516-1.412,3.467-2.602c0.953-1.19,1.497-2.465,1.633-3.824c-1.359,0-2.602-0.597-3.723-1.786   C0.92,10.09,0.359,8.509,0.359,6.538z"/></g></svg>
-          </div>
-        </div>
-        <div id="inputs" class="inputs hide">
-          <form id="input-link-form" class="link-form">
-            <input id="link-input" type="text" class="link-input" placeholder="link" autocomplete="off" />
-          </form>
-          <div id="close-link-input" class="close-link-input">x</div>
-        </div>
-      </div>
-      <div id="side-controlls" class="side-controlls">
-        <div class="buttons">
-          <div class="side-controll" id="external-link">🐦</div>
-          <div class="side-controll" id="image">🖼</div>
-        </div>
+      <h1 id="title" class="title" placeholder="Title" contenteditable=true spellcheck="false"></h1>
+      <h2 id="name" class="name" placeholder="your name" contenteditable=true spellcheck="false"></h2>
+      <div id="story" class="story" contenteditable="true">
+        <p placeholder="your story" class="paragraph" contenteditable=true spellcheck="false">12</p>
       </div>
 
-      <div id="story" class="story" contenteditable=true>
-        <p placeholder="your story" class="paragraph"></p>
-      </div>
-      <button id="publish-button">Publish</button>
     </div>
-
+    <button id="publish-button">Publish</button>
+    <div id="controlls" class="controlls hide" unselectable="on">
+      <div id="buttons" class="buttons">
+        <div id="link" class="controll link">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2"/></svg>
+        </div>
+        <div id="head-3" class="controll head-3">
+          <svg stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" x2="15" y1="20" y2="20"/><line x1="12" x2="12" y1="4" y2="20"/></svg>
+        </div>
+        <div id="head-4" class="controll head-4">
+          <svg stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" x2="15" y1="20" y2="20"/><line x1="12" x2="12" y1="4" y2="20"/></svg>
+        </div>
+        <div id="blockquote" class="controll quote">
+          <svg enable-background="new 0 0 33 25" height="25px" id="Layer_1" version="1.1" viewBox="0 0 33 25" width="33px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path fill="currentColor" d="M18.006,6.538c0-1.973,0.662-3.554,1.988-4.743c1.326-1.19,2.977-1.785,4.947-1.785   c2.517,0,4.488,0.799,5.916,2.397C32.285,4.004,33,6.13,33,8.782c0,2.719-0.424,5.032-1.275,6.936   c-0.85,1.903-1.869,3.483-3.061,4.743c-1.188,1.258-2.43,2.244-3.723,2.958c-1.291,0.714-2.413,1.239-3.365,1.581l-3.265-5.508   c1.36-0.545,2.517-1.412,3.468-2.602c0.953-1.19,1.496-2.465,1.633-3.824c-1.359,0-2.602-0.597-3.724-1.786   C18.566,10.09,18.006,8.509,18.006,6.538z M0.359,6.538c0-1.973,0.663-3.554,1.989-4.743C3.674,0.604,5.324,0.01,7.295,0.01   c2.518,0,4.488,0.799,5.916,2.397c1.429,1.597,2.143,3.723,2.143,6.375c0,2.719-0.424,5.032-1.275,6.936   c-0.85,1.903-1.869,3.483-3.06,4.743c-1.188,1.258-2.431,2.244-3.724,2.958C6.004,24.133,4.883,24.658,3.93,25l-3.264-5.508   c1.36-0.545,2.516-1.412,3.467-2.602c0.953-1.19,1.497-2.465,1.633-3.824c-1.359,0-2.602-0.597-3.723-1.786   C0.92,10.09,0.359,8.509,0.359,6.538z"/></g></svg>
+        </div>
+      </div>
+      <div id="inputs" class="inputs hide">
+        <form id="input-link-form" class="link-form">
+          <input id="link-input" type="text" class="link-input" placeholder="link" autocomplete="off" />
+        </form>
+        <div id="close-link-input" class="close-link-input">x</div>
+      </div>
+    </div>
+    <div id="side-controlls" class="side-controlls hide">
+      <div class="buttons">
+        <div class="side-controll" id="external-link">🐦</div>
+        <div class="side-controll" id="image">🖼</div>
+      </div>
+    </div>
     <script src="/index.js"></script>
   </body>
 </html>

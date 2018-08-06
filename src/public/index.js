@@ -2,8 +2,10 @@ const App = {
   selections: [],
   startApp: function() {
     const app = this
+    document.execCommand("defaultParagraphSeparator", false, "p")
 
     app.els = {
+      editor: document.getElementById("editor"),
       title: document.getElementById("title"),
       name: document.getElementById("name"),
       story: document.getElementById("story"),
@@ -32,12 +34,19 @@ const App = {
       app.saveToLocalstorage()
     })
 
-    app.els.story.addEventListener("input", () => {
-      app.els.story.classList.remove("invalid")
+    app.els.editor.addEventListener("input", () => {
+      app.els.editor.classList.remove("invalid")
+
+      if (app.els.story.children.length === 0) {
+        const newParagraph = document.createElement("p")
+        newParagraph.classList.add("paragraph")
+        newParagraph.appendChild(document.createTextNode("1. "))
+        // app.els.story.appendChild(newParagraph)
+      }
       app.saveToLocalstorage()
     })
 
-    app.els.story.addEventListener("input", e => {
+    app.els.editor.addEventListener("input", e => {
       if (e.inputType !== "insertText") return
 
       app.setParagraphNode()
@@ -66,17 +75,8 @@ const App = {
     })
 
     app.els.linkControll.addEventListener("click", e => {
-
-      // app.linkSelection = app.previousSelection
-
       if (app.isSelectionContainsTag("A")) {
         document.execCommand("unlink")
-
-        // const linkNodes = app.filteredSelectedNodes("A")
-        // linkNodes.map(node => {
-        //   node.insertAdjacentHTML("beforebegin", node.innerHTML)
-        //   node.remove()
-        // })
       } else {
         app.toggleLinkForm()
       }
@@ -126,6 +126,51 @@ const App = {
       const app = this
       app.isMouseUp = true
     })
+
+    document.addEventListener("keyup", (e) => {
+
+      switch (e.code) {
+        case "Space":
+          const nodeName= app.selectionRange.startContainer.nodeName
+
+          if (nodeName === "#text") {
+            const parentNodeName = app.selectionRange.startContainer.parentNode.nodeName
+            if (parentNodeName !== "LI") {
+              const input = app.selectionRange.startContainer.textContent.toString()
+
+              switch (input) {
+                case "1. ":
+                  document.execCommand("insertOrderedList")
+                  document.getSelection().getRangeAt(0).startContainer.textContent = ""
+                  break
+                case "- ":
+                  document.execCommand("insertUnorderedList")
+                  document.getSelection().getRangeAt(0).startContainer.textContent = ""
+                  break
+                case "* ":
+                  document.execCommand("insertUnorderedList")
+                  document.getSelection().getRangeAt(0).startContainer.textContent = ""
+                  break
+              }
+            }
+          }
+          break
+        case "Enter":
+          const selectedNode = app.selection.getRangeAt(0).startContainer
+          if ((selectedNode.tagName === "P") && (!selectedNode.classList.contains("paragraph"))) {
+            selectedNode.classList.add("paragraph")
+            selectedNode.parentNode.parentNode.appendChild(selectedNode)
+
+            const newRange = document.createRange()
+            newRange.setStart(selectedNode, 0)
+
+            app.selection.removeAllRanges()
+            app.selection.addRange(newRange)
+          }
+          break
+      }
+    })
+
   },
   toggleLinkForm: function() {
     const app = this
@@ -374,23 +419,16 @@ const App = {
   },
   loadFromLocalstorage: function() {
     const app = this
-    const { title, name, story } = app.els
+    const { editor } = app.els
     let draft = localStorage.getItem("draft")
     if (!draft) return
 
-    draft = JSON.parse(draft)
-    title.textContent = draft.title
-    name.textContent = draft.name
-    story.innerHTML = draft.story
+    // editor.innerHTML = draft
   },
   saveToLocalstorage: function() {
     const app = this
-    const { title, name, story } = app.els
-    const draft = {
-      title: title.textContent,
-      name: name.textContent,
-      story: story.innerHTML
-    }
+    const { editor } = app.els
+    const draft = editor.innerHTML
     localStorage.setItem("draft", JSON.stringify(draft))
   }
 }

@@ -2,7 +2,7 @@ body {
 }
 
 .editor {
-  max-width: 690px;
+  max-width: 490px;
   margin: auto;
 }
 
@@ -24,7 +24,7 @@ body {
   font-size: small;
 }
 
-.story .paragraph:nth-child(1):empty:before{
+.paragraph:nth-child(1):empty:before{
   content: attr(placeholder);
   display: block;
 }
@@ -93,12 +93,17 @@ body {
   text-align: center;
   border-radius: 3px;
   color: white;
+  margin-right: 5px;
 
   -moz-user-select: -moz-none;
   -khtml-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+.controll:nth-last-child(1) {
+  margin-right: 0;
 }
 
 .controll.link {
