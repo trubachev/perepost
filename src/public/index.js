@@ -157,9 +157,9 @@ const App = {
           break
         case "Enter":
           const selectedNode = app.selection.getRangeAt(0).startContainer
-          if ((selectedNode.tagName === "P") && (!selectedNode.classList.contains("paragraph"))) {
+          if ((selectedNode.tagName === "P") && (!selectedNode.classList.contains("paragraph")) && (selectedNode.parentNode.tagName === "P")) {
             selectedNode.classList.add("paragraph")
-            selectedNode.parentNode.parentNode.appendChild(selectedNode)
+            insertAfter(selectedNode, selectedNode.parentNode)
 
             const newRange = document.createRange()
             newRange.setStart(selectedNode, 0)
@@ -441,3 +441,15 @@ const pasteTextLikeClipboard = function(text) {
 document.addEventListener("DOMContentLoaded", () => {
   App.startApp()
 })
+
+
+// https://learn.javascript.ru/task/insert-after
+function insertAfter(elem, refElem) {
+  const parent = refElem.parentNode;
+  const next = refElem.nextSibling;
+  if (next) {
+    return parent.insertBefore(elem, next);
+  } else {
+    return parent.appendChild(elem);
+  }
+}
