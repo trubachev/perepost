@@ -1,5 +1,4 @@
 const App = {
-  selections: [],
   startApp: function() {
     const app = this
     document.execCommand("defaultParagraphSeparator", false, "p")
@@ -9,18 +8,21 @@ const App = {
       title: document.getElementById("title"),
       name: document.getElementById("name"),
       story: document.getElementById("story"),
-      controlls: document.getElementById("controlls"),
+      topControlls: {
+        popup: document.getElementById("top-controlls"),
+        buttons: document.getElementById("buttons"),
+        inputs: document.getElementById("inputs"),
+        head3: document.getElementById("head-3"),
+        head4: document.getElementById("head-4"),
+        blockQuote: document.getElementById("blockquote"),
+        link: document.getElementById("link"),
+        linkInputForm: document.getElementById("input-link-form"),
+        linkInput: document.getElementById("link-input"),
+        linkFormClose: document.getElementById("close-link-input")
+      },
       sideControlls: document.getElementById("side-controlls"),
-      controllsButtons: document.getElementById("buttons"),
-      controllsInputs: document.getElementById("inputs"),
-      head3Controll: document.getElementById("head-3"),
-      head4Controll: document.getElementById("head-4"),
-      blockQuoteControll: document.getElementById("blockquote"),
-      linkControll: document.getElementById("link"),
-      inputLinkForm: document.getElementById("input-link-form"),
-      linkInput: document.getElementById("link-input"),
-      publishButton: document.getElementById("publish-button"),
-      closeLinkForm: document.getElementById("close-link-input")
+      imageConroll: document.getElementById("image"),
+      publishButton: document.getElementById("publish-button")
     }
     app.loadFromLocalstorage()
     app.bindControlls()
@@ -62,19 +64,19 @@ const App = {
       app.publish()
     })
 
-    app.els.head3Controll.addEventListener("click", e => {
+    app.els.topControlls.head3.addEventListener("click", e => {
       app.toggleSeltedNodeTag("H3")
     })
 
-    app.els.head4Controll.addEventListener("click", e => {
+    app.els.topControlls.head4.addEventListener("click", e => {
       app.toggleSeltedNodeTag("H4")
     })
 
-    app.els.blockQuoteControll.addEventListener("click", e => {
+    app.els.topControlls.blockQuote.addEventListener("click", e => {
       app.toggleSeltedNodeTag("BLOCKQUOTE")
     })
 
-    app.els.linkControll.addEventListener("click", e => {
+    app.els.topControlls.link.addEventListener("click", e => {
       if (app.isSelectionContainsTag("A")) {
         document.execCommand("unlink")
       } else {
@@ -82,16 +84,16 @@ const App = {
       }
     })
 
-    app.els.closeLinkForm.addEventListener("click", e => {
+    app.els.topControlls.linkFormClose.addEventListener("click", e => {
       app.toggleLinkForm()
     })
 
     document.addEventListener("selectionchange", app.updateControlls.bind(app))
 
-    app.els.inputLinkForm.addEventListener("submit", e => {
+    app.els.topControlls.linkInputForm.addEventListener("submit", e => {
       e.preventDefault()
 
-      const link = app.els.linkInput.value
+      const link = app.els.topControlls.linkInput.value
 
       app.selection.removeAllRanges()
       app.selection.addRange(app.previousSelectionRange)
@@ -99,8 +101,13 @@ const App = {
       document.execCommand("createLink", false, link)
 
       app.toggleLinkForm()
-      app.els.linkInput.value = null
+      app.els.topControlls.linkInput.value = null
       app.updateControllsButtons()
+    })
+
+    app.els.imageConroll.addEventListener("click", e => {
+      console.log(1)
+      e.preventDefault()
     })
 
     Array.from(document.querySelectorAll("[contenteditable=true]")).forEach(
@@ -127,29 +134,35 @@ const App = {
       app.isMouseUp = true
     })
 
-    document.addEventListener("keyup", (e) => {
-
+    document.addEventListener("keyup", e => {
       switch (e.code) {
         case "Space":
-          const nodeName= app.selectionRange.startContainer.nodeName
+          const nodeName = app.selectionRange.startContainer.nodeName
 
           if (nodeName === "#text") {
-            const parentNodeName = app.selectionRange.startContainer.parentNode.nodeName
+            const parentNodeName =
+              app.selectionRange.startContainer.parentNode.nodeName
             if (parentNodeName !== "LI") {
               const input = app.selectionRange.startContainer.textContent.toString()
 
               switch (input) {
                 case "1. ":
                   document.execCommand("insertOrderedList")
-                  document.getSelection().getRangeAt(0).startContainer.textContent = ""
+                  document
+                    .getSelection()
+                    .getRangeAt(0).startContainer.textContent = ""
                   break
                 case "- ":
                   document.execCommand("insertUnorderedList")
-                  document.getSelection().getRangeAt(0).startContainer.textContent = ""
+                  document
+                    .getSelection()
+                    .getRangeAt(0).startContainer.textContent = ""
                   break
                 case "* ":
                   document.execCommand("insertUnorderedList")
-                  document.getSelection().getRangeAt(0).startContainer.textContent = ""
+                  document
+                    .getSelection()
+                    .getRangeAt(0).startContainer.textContent = ""
                   break
               }
             }
@@ -157,7 +170,11 @@ const App = {
           break
         case "Enter":
           const selectedNode = app.selection.getRangeAt(0).startContainer
-          if ((selectedNode.tagName === "P") && (!selectedNode.classList.contains("paragraph")) && (selectedNode.parentNode.tagName === "P")) {
+          if (
+            selectedNode.tagName === "P" &&
+            !selectedNode.classList.contains("paragraph") &&
+            selectedNode.parentNode.tagName === "P"
+          ) {
             selectedNode.classList.add("paragraph")
             insertAfter(selectedNode, selectedNode.parentNode)
 
@@ -170,15 +187,14 @@ const App = {
           break
       }
     })
-
   },
   toggleLinkForm: function() {
     const app = this
 
-    const { controllsButtons, controllsInputs } = app.els
+    const { buttons, inputs } = app.els.topControlls
 
-    controllsButtons.classList.toggle("hide")
-    controllsInputs.classList.toggle("hide")
+    buttons.classList.toggle("hide")
+    inputs.classList.toggle("hide")
   },
   updateControlls: function(e) {
     const app = this
@@ -190,21 +206,27 @@ const App = {
 
     if (
       app.selectionRange &&
-      app.selectionRange.startContainer !== app.els.inputLinkForm
-    )
+      app.selectionRange.startContainer !== app.els.topControlls.linkInputForm
+    ) {
       app.previousSelectionRange = app.selectionRange
-    if (app.selection.rangeCount > 0)
+    }
+
+    if (app.selection.rangeCount > 0) {
       app.selectionRange = app.selection.getRangeAt(0)
+    }
+
     app.updateControllsVisibility()
     app.updateSideControllsVisibility()
 
     const shouldUpdatePosition =
-      !app.els.controlls.classList.contains("hide") &&
-      app.selectedNode !== app.els.controllsInputs &&
+      !app.els.topControlls.popup.classList.contains("hide") &&
+      app.selectedNode !== app.els.topControlls.inputs &&
       app.selection.toString() !== ""
+
     const shouldUpdateButtons =
-      !app.els.controlls.classList.contains("hide") &&
-      app.selectedNode !== app.els.controllsInputs
+      !app.els.topControlls.popup.classList.contains("hide") &&
+      app.selectedNode !== app.els.topControlls.popup
+
     const shouldUpdateSideControllsPosition = !app.els.sideControlls.classList.contains(
       "hide"
     )
@@ -282,25 +304,21 @@ const App = {
     const app = this
 
     const rect = app.selectionRange.getBoundingClientRect()
-    const controllsWidth = app.els.controlls.getBoundingClientRect().width
-    const controllsHeight = app.els.controlls.getBoundingClientRect().height
+    const controllsWidth = app.els.topControlls.popup.getBoundingClientRect()
+      .width
+    const controllsHeight = app.els.topControlls.popup.getBoundingClientRect()
+      .height
     let leftOffset = rect.left - controllsWidth / 2 + rect.width / 2
     const minimalLeftOffset = 8
     if (leftOffset < minimalLeftOffset) leftOffset = minimalLeftOffset
     const topOffset = rect.top + window.pageYOffset - controllsHeight - 5
-    app.els.controlls.style.transform = `translate(${leftOffset}px, ${topOffset}px)`
+    app.els.topControlls.popup.style.transform = `translate(${leftOffset}px, ${topOffset}px)`
   },
 
   updateControllsButtons: function() {
     const app = this
 
-    const {
-      controllsButtons,
-      head3Controll,
-      head4Controll,
-      blockQuoteControll,
-      linkControll
-    } = app.els
+    const { buttons, head3, head4, blockQuote, link } = app.els.topControlls
 
     const { paragraphNode } = app
 
@@ -308,32 +326,31 @@ const App = {
 
     const paragraphNodeTagName = paragraphNode.tagName
 
-    Array.from(controllsButtons.children).forEach(controll => {
+    Array.from(buttons.children).forEach(controll => {
       controll.classList.remove("controll-active")
     })
 
     switch (paragraphNodeTagName) {
       case "H3":
-        head3Controll.classList.add("controll-active")
+        head3.classList.add("controll-active")
         break
       case "H4":
-        head4Controll.classList.add("controll-active")
+        head4.classList.add("controll-active")
         break
       case "BLOCKQUOTE":
-        blockQuoteControll.classList.add("controll-active")
+        blockQuote.classList.add("controll-active")
         break
       default:
         break
     }
 
-    if (app.isSelectionContainsTag("A"))
-      linkControll.classList.add("controll-active")
+    if (app.isSelectionContainsTag("A")) link.classList.add("controll-active")
   },
 
   updateControllsVisibility: function() {
     const app = this
 
-    if (app.selectedNode === app.els.controllsInputs) return
+    if (app.selectedNode === app.els.topControlls.inputs) return
     if (app.selection.toString() === "") return app.hideControlls()
     if (!app.paragraphNode) return app.hideControlls()
     app.showControlls()
@@ -342,9 +359,12 @@ const App = {
   updateSideControllsVisibility: function() {
     const app = this
 
-    if (app.paragraphNode && app.paragraphNode.textContent === "")
-      app.showSideControlls()
-    else app.hideSideControlls()
+    if (app.paragraphNode && app.paragraphNode.textContent === "") {
+      return app.showSideControlls()
+    } else if (app.selectedNode === app.els.imageConroll) {
+      return
+    }
+    app.hideSideControlls()
   },
 
   showSideControlls: function() {
@@ -363,12 +383,12 @@ const App = {
       clearTimeout(app.hideControllsTimer)
       delete app.hideControllsTimer
     }
-    app.els.controlls.classList.remove("hide")
+    app.els.topControlls.popup.classList.remove("hide")
   },
   hideControlls: function() {
     const app = this
     app.hideControllsTimer = setTimeout(() => {
-      app.els.controlls.classList.add("hide")
+      app.els.topControlls.popup.classList.add("hide")
     }, 300)
   },
   toggleSeltedNodeTag: function(newTag) {
@@ -395,7 +415,11 @@ const App = {
     const app = this
 
     const commonAncestor = app.selection.getRangeAt(0).commonAncestorContainer
-    if (commonAncestor.nodeName === "#text" && commonAncestor.parentNode.tagName === "A") return true
+    if (
+      commonAncestor.nodeName === "#text" &&
+      commonAncestor.parentNode.tagName === "A"
+    )
+      return true
     if (commonAncestor.nodeName === "#text") return false
 
     return Array.from(commonAncestor.children).some(el => {
@@ -433,7 +457,6 @@ const App = {
   }
 }
 
-
 const pasteTextLikeClipboard = function(text) {
   document.execCommand("insertHTML", false, text)
 }
@@ -442,14 +465,13 @@ document.addEventListener("DOMContentLoaded", () => {
   App.startApp()
 })
 
-
 // https://learn.javascript.ru/task/insert-after
 function insertAfter(elem, refElem) {
-  const parent = refElem.parentNode;
-  const next = refElem.nextSibling;
+  const parent = refElem.parentNode
+  const next = refElem.nextSibling
   if (next) {
-    return parent.insertBefore(elem, next);
+    return parent.insertBefore(elem, next)
   } else {
-    return parent.appendChild(elem);
+    return parent.appendChild(elem)
   }
 }

@@ -6,16 +6,16 @@ body {
   margin: auto;
 }
 
-[contenteditable=true] {
+[contenteditable="true"] {
   outline: none;
 }
 
-.title[contenteditable=true]:empty:before {
+.title[contenteditable="true"]:empty:before {
   content: attr(placeholder);
   display: block;
 }
 
-.name[contenteditable=true]:empty:before {
+.name[contenteditable="true"]:empty:before {
   content: attr(placeholder);
   display: block;
 }
@@ -24,11 +24,10 @@ body {
   font-size: small;
 }
 
-.paragraph:nth-child(1):empty:before{
+.paragraph:nth-child(1):empty:before {
   content: attr(placeholder);
   display: block;
 }
-
 
 .story p::selection {
   color: white;
@@ -80,11 +79,9 @@ body {
   outline: none;
 }
 
-
 .link-form {
   margin: 0;
 }
-
 
 .controll {
   cursor: pointer;
@@ -122,7 +119,6 @@ body {
   width: 14px;
 }
 
-
 .controll.link svg {
   width: 15px;
   height: 15px;
@@ -131,14 +127,13 @@ body {
 .controll.head-4 {
   display: flex;
   justify-content: flex-end;
-  align-items: flex-end
+  align-items: flex-end;
 }
 
 .controll.head-4 svg {
   width: 25px;
   height: 25px;
 }
-
 
 .controll svg {
   width: 30px;
@@ -149,7 +144,6 @@ body {
   background-color: white;
   color: black;
 }
-
 
 .controll:hover {
   background-color: white;
@@ -170,7 +164,6 @@ body {
   border: 1px solid black;
   cursor: pointer;
 }
-
 
 .hide {
   display: none;
