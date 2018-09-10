@@ -168,3 +168,22 @@ body {
 .hide {
   display: none;
 }
+
+.image-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.image-widget img {
+  cursor: pointer;
+  max-width: 300px;
+}
+
+.image-widget .image-widget-delete {
+  color: red;
+  cursor: pointer;
+  text-decoration: underline;
+
+  font-size: small;
+}

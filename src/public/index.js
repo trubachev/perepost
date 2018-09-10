@@ -20,8 +20,10 @@ const App = {
         linkInput: document.getElementById("link-input"),
         linkFormClose: document.getElementById("close-link-input")
       },
-      sideControlls: document.getElementById("side-controlls"),
-      imageConroll: document.getElementById("image"),
+      sideControlls: {
+        popup: document.getElementById("side-controlls"),
+        image: document.getElementById("image")
+      },
       publishButton: document.getElementById("publish-button")
     }
     app.loadFromLocalstorage()
@@ -105,9 +107,13 @@ const App = {
       app.updateControllsButtons()
     })
 
-    app.els.imageConroll.addEventListener("click", e => {
-      console.log(1)
+    app.els.sideControlls.image.addEventListener("click", e => {
       e.preventDefault()
+      const imageWidget = createImageWidget()
+
+      app.els.story.insertBefore(imageWidget, app.paragraphNodeTemp)
+      app.paragraphNodeTemp = null
+      app.hideSideControlls()
     })
 
     Array.from(document.querySelectorAll("[contenteditable=true]")).forEach(
@@ -227,9 +233,9 @@ const App = {
       !app.els.topControlls.popup.classList.contains("hide") &&
       app.selectedNode !== app.els.topControlls.popup
 
-    const shouldUpdateSideControllsPosition = !app.els.sideControlls.classList.contains(
-      "hide"
-    )
+    const shouldUpdateSideControllsPosition =
+      !app.els.sideControlls.popup.classList.contains("hide") &&
+      app.selectedNode !== app.els.sideControlls.image
 
     if (shouldUpdateSideControllsPosition) app.updateSideControllsPosition()
     if (shouldUpdatePosition) app.updateControllsPosition()
@@ -295,10 +301,11 @@ const App = {
   updateSideControllsPosition: function() {
     const app = this
     const rect = app.paragraphNode.getBoundingClientRect()
-    const controllsRect = app.els.sideControlls.getBoundingClientRect()
+    const controllsRect = app.els.sideControlls.popup.getBoundingClientRect()
     const topOffset = rect.top + window.pageYOffset - controllsRect.height / 4
     const leftOffset = rect.left - controllsRect.width - 10
-    app.els.sideControlls.style.transform = `translate(${leftOffset}px, ${topOffset}px)`
+    app.paragraphNodeTemp = app.paragraphNode
+    app.els.sideControlls.popup.style.transform = `translate(${leftOffset}px, ${topOffset}px)`
   },
   updateControllsPosition: function() {
     const app = this
@@ -350,31 +357,39 @@ const App = {
   updateControllsVisibility: function() {
     const app = this
 
-    if (app.selectedNode === app.els.topControlls.inputs) return
-    if (app.selection.toString() === "") return app.hideControlls()
-    if (!app.paragraphNode) return app.hideControlls()
+    if (app.selectedNode === app.els.topControlls.inputs) {
+      return
+    }
+    if (app.selection.toString() === "") {
+      return app.hideControlls()
+    }
+    if (!app.paragraphNode) {
+      return app.hideControlls()
+    }
     app.showControlls()
   },
 
   updateSideControllsVisibility: function() {
     const app = this
 
-    if (app.paragraphNode && app.paragraphNode.textContent === "") {
-      return app.showSideControlls()
-    } else if (app.selectedNode === app.els.imageConroll) {
+    if (app.selectedNode === app.els.sideControlls.image) {
       return
     }
-    app.hideSideControlls()
+
+    if (!app.paragraphNode || app.paragraphNode.textContent !== "") {
+      return app.hideSideControlls()
+    }
+    app.showSideControlls()
   },
 
   showSideControlls: function() {
     const app = this
-    app.els.sideControlls.classList.remove("hide")
+    app.els.sideControlls.popup.classList.remove("hide")
   },
 
   hideSideControlls: function() {
     const app = this
-    app.els.sideControlls.classList.add("hide")
+    app.els.sideControlls.popup.classList.add("hide")
   },
   showControlls: function() {
     const app = this
@@ -459,6 +474,55 @@ const App = {
 
 const pasteTextLikeClipboard = function(text) {
   document.execCommand("insertHTML", false, text)
+}
+
+const createImageWidget = () => {
+  const imageWidgetDiv = document.createElement("div")
+  imageWidgetDiv.classList.add("image-widget")
+  imageWidgetDiv.setAttribute("contenteditable", "false")
+
+  const imageWidgetPreview = document.createElement("img")
+  imageWidgetPreview.setAttribute("src", "/image-placeholder.svg")
+
+  const imageWidgetInput = document.createElement("input")
+  imageWidgetInput.setAttribute("type", "file")
+  imageWidgetInput.setAttribute("accept", "image/*")
+  imageWidgetInput.classList.add("hide")
+  imageWidgetInput.addEventListener("change", event => {
+    if (event.target.files && event.target.files[0]) {
+      const reader = new FileReader()
+
+      reader.onload = e => {
+        imageWidgetPreview.setAttribute("src", e.target.result)
+        imageWidgetPreview.classList.remove("hide")
+      }
+
+      reader.readAsDataURL(event.target.files[0])
+    }
+  })
+
+  imageWidgetPreview.addEventListener("click", e => {
+    imageWidgetInput.click()
+  })
+
+  const imageWidgetTitle = document.createElement("input")
+  imageWidgetTitle.setAttribute("type", "text")
+  imageWidgetTitle.setAttribute("placeholder", "add description or not")
+
+  const imageWidgetDelete = document.createElement("div")
+  imageWidgetDelete.classList.add("image-widget-delete")
+  imageWidgetDelete.innerHTML = "delete"
+  imageWidgetDelete.addEventListener("click", e => {
+    if (confirm("Do you want to delete image?")) {
+      imageWidgetDiv.remove()
+    }
+  })
+
+  imageWidgetDiv.appendChild(imageWidgetPreview)
+  imageWidgetDiv.appendChild(imageWidgetInput)
+  imageWidgetDiv.appendChild(imageWidgetTitle)
+  imageWidgetDiv.appendChild(imageWidgetDelete)
+  return imageWidgetDiv
 }
 
 document.addEventListener("DOMContentLoaded", () => {
