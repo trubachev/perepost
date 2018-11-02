@@ -505,8 +505,9 @@ const createImageWidget = () => {
     imageWidgetInput.click()
   })
 
-  const imageWidgetTitle = document.createElement("input")
-  imageWidgetTitle.setAttribute("type", "text")
+  const imageWidgetTitle = document.createElement("div")
+  imageWidgetTitle.classList.add("title")
+  imageWidgetTitle.setAttribute("contenteditable", "true")
   imageWidgetTitle.setAttribute("placeholder", "add description or not")
 
   const imageWidgetDelete = document.createElement("div")
