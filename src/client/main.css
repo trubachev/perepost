@@ -1,0 +1,194 @@
+body {
+}
+
+.editor {
+  max-width: 490px;
+  margin: auto;
+}
+
+[contenteditable="true"] {
+  outline: none;
+}
+
+.title[contenteditable="true"]:empty:before {
+  content: attr(placeholder);
+  display: block;
+}
+
+.name[contenteditable="true"]:empty:before {
+  content: attr(placeholder);
+  display: block;
+}
+
+.name {
+  font-size: small;
+}
+
+.paragraph:nth-child(1):empty:before {
+  content: attr(placeholder);
+  display: block;
+}
+
+.story p::selection {
+  color: white;
+  background: black;
+}
+
+.invalid {
+  border-bottom: 1px solid red;
+}
+
+.controlls {
+  display: flex;
+  padding: 5px;
+  background-color: black;
+  border-radius: 3px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition-duration: 0.3s;
+  transition-delay: 0.1s;
+  align-items: center;
+}
+
+.buttons {
+  display: flex;
+}
+
+.inputs {
+  display: flex;
+}
+
+.close-link-input {
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  cursor: pointer;
+  width: 20px;
+  text-align: center;
+}
+
+.link-input {
+  background-color: black;
+  border: none;
+  padding: 5px;
+  border-bottom: 1px solid gray;
+  color: white;
+}
+
+.link-input:focus {
+  outline: none;
+}
+
+.link-form {
+  margin: 0;
+}
+
+.controll {
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  border-radius: 3px;
+  color: white;
+  margin-right: 5px;
+
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.controll:nth-last-child(1) {
+  margin-right: 0;
+}
+
+.controll.link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.controll.quote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.controll.quote svg {
+  width: 14px;
+}
+
+.controll.link svg {
+  width: 15px;
+  height: 15px;
+}
+
+.controll.head-4 {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.controll.head-4 svg {
+  width: 25px;
+  height: 25px;
+}
+
+.controll svg {
+  width: 30px;
+  height: 30px;
+}
+
+.controll-active {
+  background-color: white;
+  color: black;
+}
+
+.controll:hover {
+  background-color: white;
+  color: black;
+}
+
+.side-controlls {
+  position: absolute;
+  transition-duration: 0.3s;
+  top: 0;
+  left: 0;
+}
+
+.side-controll {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  border: 1px solid black;
+  cursor: pointer;
+}
+
+.hide {
+  display: none;
+}
+
+.image-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.image-widget img {
+  cursor: pointer;
+  max-width: 300px;
+}
+
+.image-widget .image-widget-delete {
+  color: red;
+  cursor: pointer;
+  text-decoration: underline;
+
+  font-size: small;
+}
+
+.image-widget .title:empty:before {
+  content: attr(placeholder);
+  display: block;
+}
