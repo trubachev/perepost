@@ -1,12 +1,10 @@
 const path = require("path")
 
-console.log(path.join(__dirname, "src", "client"))
-
-module.exports = {
+const clientConfig = {
   entry: "./src/client/index.ts",
   output: {
-    filename: "bundle.js",
-    path: path.resolve(__dirname, "dist")
+    path: path.resolve(__dirname, "dist"),
+    filename: "bundle.js"
   },
   resolve: {
     extensions: [".ts", ".js"],
@@ -54,10 +52,43 @@ module.exports = {
       }
     ]
   },
-  devServer: {
-    contentBase: path.join(__dirname, "dist"),
-    compress: true,
-    port: 9009
-  },
+  target: "web",
   mode: "development"
 }
+
+const serverConfig = {
+  entry: "./src/server/index.ts",
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "server.js"
+  },
+  resolve: {
+    extensions: [".ts", ".js"],
+    alias: {
+      perepost: path.join(__dirname, "src", "server")
+    }
+  },
+  module: {
+    rules: [
+      {
+        test: /\.ts?$/,
+        exclude: /node_modules/,
+        use: "ts-loader"
+      },
+      {
+        test: /\.js$/,
+        exclude: /(node_modules)/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env"]
+          }
+        }
+      }
+    ]
+  },
+  target: "node",
+  mode: "development"
+}
+
+module.exports = [clientConfig, serverConfig]
