@@ -1,3 +1,4 @@
 node_modules
 stories/*
 dist
+yarn-error.log

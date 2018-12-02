@@ -1,4 +1,5 @@
 const path = require("path")
+const CopyWebpackPlugin = require("copy-webpack-plugin")
 
 const clientConfig = {
   entry: "./src/client/index.ts",
@@ -52,8 +53,21 @@ const clientConfig = {
       }
     ]
   },
+  plugins: [
+    new CopyWebpackPlugin([
+      {
+        from: path.join(__dirname, "src", "client", "index.html"),
+        to: "static"
+      },
+      {
+        from: path.join(__dirname, "src", "client", "main.css"),
+        to: "static"
+      }
+    ])
+  ],
   target: "web",
-  mode: "development"
+  mode: "development",
+  watch: true
 }
 
 const serverConfig = {
@@ -88,7 +102,8 @@ const serverConfig = {
     ]
   },
   target: "node",
-  mode: "development"
+  mode: "development",
+  watch: true
 }
 
 module.exports = [clientConfig, serverConfig]

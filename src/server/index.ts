@@ -6,7 +6,7 @@ import routes from "./routes"
 
 const app = express()
 
-app.use(express.static(path.join(process.cwd(), "static")))
+app.use(express.static(path.join(process.cwd(), "dist", "static")))
 app.use(express.static(path.join(process.cwd(), "stories")))
 app.use(bodyParser.json())
 
